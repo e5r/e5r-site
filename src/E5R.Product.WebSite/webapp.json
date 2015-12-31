@@ -1,0 +1,11 @@
+{
+    "Data": {
+        "ConnectionStrings": {
+            "Auth": "Filename=webapp-auth.db"
+        }
+    },
+    "Auth": {
+        "DefaultRootUser": "root",
+        "DefaultRootPassword": "e5rteam"
+    }
+}
