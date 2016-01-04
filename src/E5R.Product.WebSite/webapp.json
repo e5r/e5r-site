@@ -1,0 +1,16 @@
+{
+    "Auth": {
+        "DefaultRootUser": "",
+        "DefaultRootPassword": "",
+        "ConnectionString": ""
+    },
+    "Identity": {
+        "Password": {
+            "RequireDigit": "false",
+            "RequireLowercase": "false",
+            "RequireUppercase": "false",
+            "RequireNonLetterOrDigit": "false",
+            "RequiredLength": "false"
+        }
+    }
+}
