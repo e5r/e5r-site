@@ -5,7 +5,9 @@ A web site for E5R Development Team. _(Under construction!)_
 
 ## Preparando o ambiente de desenvolvimento
 
-### 1. Instale o ambiente ASP.NET 5. (Veja as instruções em https://docs.asp.net/en/latest/getting-started/index.html)
+### 1. Instale o ambiente ASP.NET 5.
+
+Veja as instruções em https://docs.asp.net/en/latest/getting-started/index.html
 
 ### 2. Instale as ferramentas **SecretManager** e **dnx-watch**
 
