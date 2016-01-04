@@ -2,6 +2,7 @@ using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Data.Entity;
@@ -41,7 +42,7 @@ namespace E5R.Product.WebSite
                 .AddSqlite()
                 .AddDbContext<AuthContext>(options =>
                 {
-                    options.UseSqlite(Configuration["Data:ConnectionStrings:Auth"]);
+                    options.UseSqlite(Configuration["Auth:ConnectionString"]);
                 });
 
             services.Configure<AuthOptions>(options =>
@@ -52,8 +53,9 @@ namespace E5R.Product.WebSite
 
             services.AddIdentity<User, IdentityRole>(options =>
             {
+                IdentityCookieOptions.ApplicationCookieAuthenticationType = AuthOptions.APPLICATION_COOKIE;
                 options.Cookies.ApplicationCookieAuthenticationScheme = AuthOptions.APPLICATION_COOKIE;
-                options.Cookies.ApplicationCookie.AuthenticationScheme = IdentityCookieOptions.ApplicationCookieAuthenticationType = AuthOptions.APPLICATION_COOKIE;
+                options.Cookies.ApplicationCookie.AuthenticationScheme = AuthOptions.APPLICATION_COOKIE;
                 options.Cookies.ApplicationCookie.CookieName = AuthOptions.COOKIE;
             })
             .AddEntityFrameworkStores<AuthContext>()
@@ -62,21 +64,26 @@ namespace E5R.Product.WebSite
             services.AddMvc();
         }
 
-        public void Configure(IApplicationBuilder app)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
+            if (env.IsDevelopment())
+            {
+                loggerFactory.AddConsole(LogLevel.Verbose);
+            }
+
             app.UseDeveloperExceptionPage()
+                .UseStatusCodePages()
                 .UseStaticFiles()
                 .UseIdentity()
                 .UseMvc(routes =>
                 {
                     routes.MapRoute(
                         name: "default",
-                        template: "{controller}/{action}/{id?}",
-                        defaults: new { controller = "home", action = "index" }
+                        template: "{controller=home}/{action=index}/{id?}"
                     );
                 });
-                
-               SampleData.InitializeDatabaseAsync(app.ApplicationServices).Wait();
+
+            SampleData.EnsureDatabaseAsync(app.ApplicationServices).Wait();
         }
     }
 }

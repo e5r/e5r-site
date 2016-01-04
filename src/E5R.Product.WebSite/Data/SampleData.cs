@@ -13,7 +13,7 @@ namespace E5R.Product.WebSite.Data
 
     public class SampleData
     {
-        public static async Task InitializeDatabaseAsync(IServiceProvider serviceProvider)
+        public static async Task EnsureDatabaseAsync(IServiceProvider serviceProvider)
         {
             using (var context = serviceProvider.GetRequiredService<AuthContext>())
             {
