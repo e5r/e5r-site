@@ -69,11 +69,11 @@ namespace E5R.Product.WebSite
             if (env.IsDevelopment())
             {
                 loggerFactory.AddConsole(LogLevel.Verbose);
+                app.UseDeveloperExceptionPage()
+                    .UseStatusCodePages();
             }
 
-            app.UseDeveloperExceptionPage()
-                .UseStatusCodePages()
-                .UseStaticFiles()
+            app.UseStaticFiles()
                 .UseIdentity()
                 .UseMvc(routes =>
                 {
