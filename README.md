@@ -22,7 +22,6 @@ dnu commands install Microsoft.Dnx.Watcher
 * __Auth:DefaultRootUser__: Nome do usuário ROOT padrão
 * __Auth:DefaultRootPassword__: Senha do usuário ROOT padrão
 
-Ex:
 ```
 user-secret set Auth:ConnectionString "filename=webapp-auth.db" --project ./src/E5R.Product.WebSite
 user-secret set Auth:DefaultRootUser "[rootUserName]" --project ./src/E5R.Product.WebSite
@@ -32,5 +31,5 @@ user-secret set Auth:DefaultRootPassword "[rootPassword]" --project ./src/E5R.Pr
 ### 4. Execute a aplicação _zumbi_ para iniciar o desenvolvimento
 
 ```
-dnx-watch --project src/E5R.Product.WebSite --dnx-args web
+watch
 ```
