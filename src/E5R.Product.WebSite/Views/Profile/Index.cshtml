@@ -1,0 +1,16 @@
+@using System.Security.Claims
+
+@addTagHelper "*, Microsoft.AspNet.Mvc.TagHelpers"
+
+<h1>Profile</h1>
+
+<h3>Welcome [@User.GetUserName()]</h3>
+
+<p>
+    @User.
+</p>
+
+<ul>
+    <li><a asp-controller="Home">Home</a></li>
+    <li><a asp-controller="Account" asp-action="SignOut">Sign out</a></li>
+</ul>

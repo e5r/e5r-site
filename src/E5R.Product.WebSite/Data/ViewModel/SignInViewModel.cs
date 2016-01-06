@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace E5R.Product.WebSite.Data.ViewModel
 {
-    public class SignInModel
+    public class SignInViewModel
     {
         [Required]
         [Display(Name = "User name")]

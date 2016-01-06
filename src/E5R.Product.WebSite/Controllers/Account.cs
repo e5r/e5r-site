@@ -3,27 +3,71 @@
 
 using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
+using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Authorization;
 
 namespace E5R.Product.WebSite.Controllers
 {
     using Data.ViewModel;
-    
+    using Data.Model;
+
+    [Authorize]
     public class Account : Controller
     {
-        [HttpGet]
-        public IActionResult SignIn()
+        public Account(UserManager<User> userManager, SignInManager<User> signInManager)
         {
-            return View();
+            UserManager = userManager;
+            SignInManager = signInManager;
+        }
+        
+        public UserManager<User> UserManager { get; set; }
+        public SignInManager<User> SignInManager { get; set; }
+        
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> SignIn(string urlReturn = null)
+        {
+            ViewBag.UrlReturn = urlReturn;
+            
+            await SignInManager.SignOutAsync();
+            
+            return View(new SignInViewModel { RememberMe = true });
         }
         
         [HttpPost]
-        public async Task<IActionResult> SignIn(SignInModel model)
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SignIn(SignInViewModel model, string urlReturn = null)
         {
-            if(ModelState.IsValid)
+            ViewBag.UrlReturn = urlReturn;
+
+            if (ModelState.IsValid)
             {
-                
+                var signed = await SignInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, false);
+
+                if (signed.Succeeded && Url.IsLocalUrl(urlReturn))
+                {
+                    return Redirect(urlReturn);
+                }
+                else if (signed.Succeeded)
+                {
+                    return RedirectToAction("index", "home");
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "Invalid username or password.");
+                }
             }
+
             return View(model);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> SignOut()
+        {
+            await SignInManager.SignOutAsync();
+            
+            return RedirectToAction("index", "home");
         }
     }
 }

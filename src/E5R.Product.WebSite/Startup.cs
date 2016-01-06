@@ -63,14 +63,14 @@ namespace E5R.Product.WebSite
                 options.Cookies.ApplicationCookie.CookieName = AuthOptions.COOKIE;
                 options.Cookies.ApplicationCookie.LoginPath = new PathString("/account/signin");
                 options.Cookies.ApplicationCookie.LogoutPath = new PathString("/account/signout");
-                //options.Cookies.ApplicationCookie.ReturnUrlParameter = "";
+                options.Cookies.ApplicationCookie.ReturnUrlParameter = "urlReturn";
             })
                 .AddEntityFrameworkStores<AuthContext>()
                 .AddDefaultTokenProviders();
 
             services.ConfigureRouting(routeOptions =>
             {
-                //routeOptions.AppendTrailingSlash = true;
+                routeOptions.AppendTrailingSlash = true;
                 routeOptions.LowercaseUrls = true;
             });
 
