@@ -87,6 +87,8 @@ namespace E5R.Product.WebSite
                     .UseStatusCodePages()
                     .UseRuntimeInfoPage();
             }
+            
+            application.UseIISPlatformHandler(options => options.AuthenticationDescriptions.Clear());
 
             application.UseStaticFiles()
                 .UseIdentity()
