@@ -3,6 +3,10 @@ E5R Development Team Site
 
 A web site for E5R Development Team. _(Under construction!)_
 
+Production: **http://e5r-site.azurewebsites.net**
+
+Staging: **http://e5r-site-staging.azurewebsites.net**
+
 ## Preparando o ambiente de desenvolvimento
 
 ### 1. Instale o ambiente ASP.NET 5.
@@ -33,3 +37,34 @@ user-secret set Auth:DefaultRootPassword "[rootPassword]" --project ./src/E5R.Pr
 ```
 watch
 ```
+
+## Implantando no Azure
+
+### 1. Usando o Kudu Debug console
+
+Crie o arquivo **applicationHost.xdt** na raiz do site. Ex: **D:\home\site\applicationHost.xdt**:
+
+```
+cd D:\home\site
+@echo off > applicationHost.xdt
+```
+
+Edite o conteúdo do mesmo para:
+
+```xml
+<?xml version="1.0"?> 
+<configuration xmlns:xdt="http://schemas.microsoft.com/XML-Document-Transform"> 
+  <system.webServer> 
+    <runtime xdt:Transform="InsertIfMissing">
+      <environmentVariables xdt:Transform="InsertIfMissing">
+        <add name="Auth:ConnectionString" value="filename=webapp-auth.db" xdt:Locator="Match(name)" xdt:Transform="InsertIfMissing" />
+        <add name="Auth:DefaultRootUser" value="[rootUserName]" xdt:Locator="Match(name)" xdt:Transform="InsertIfMissing" />
+        <add name="Auth:DefaultRootPassword" value="[rootPassword]" xdt:Locator="Match(name)" xdt:Transform="InsertIfMissing" />
+        <add name="Hosting:Environment" value="[Development|Staging|Production]" xdt:Locator="Match(name)" xdt:Transform="InsertIfMissing" />
+      </environmentVariables>
+    </runtime> 
+  </system.webServer> 
+</configuration> 
+```
+
+### 2. Reinicie o site no Azure
