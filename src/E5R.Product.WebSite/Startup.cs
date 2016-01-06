@@ -1,3 +1,6 @@
+// Copyright (c) E5R Development Team. All rights reserved.
+// Licensed under the Apache License, Version 2.0. More license information in LICENSE.txt.
+
 using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -12,6 +15,7 @@ namespace E5R.Product.WebSite
     using Data;
     using Data.Context;
     using Data.Model;
+    using Microsoft.AspNet.Http;
 
     public class Startup
     {
@@ -57,23 +61,34 @@ namespace E5R.Product.WebSite
                 options.Cookies.ApplicationCookieAuthenticationScheme = AuthOptions.APPLICATION_COOKIE;
                 options.Cookies.ApplicationCookie.AuthenticationScheme = AuthOptions.APPLICATION_COOKIE;
                 options.Cookies.ApplicationCookie.CookieName = AuthOptions.COOKIE;
+                options.Cookies.ApplicationCookie.LoginPath = new PathString("/account/signin");
+                options.Cookies.ApplicationCookie.LogoutPath = new PathString("/account/signout");
+                //options.Cookies.ApplicationCookie.ReturnUrlParameter = "";
             })
-            .AddEntityFrameworkStores<AuthContext>()
-            .AddDefaultTokenProviders();
+                .AddEntityFrameworkStores<AuthContext>()
+                .AddDefaultTokenProviders();
+
+            services.ConfigureRouting(routeOptions =>
+            {
+                //routeOptions.AppendTrailingSlash = true;
+                routeOptions.LowercaseUrls = true;
+            });
 
             services.AddMvc();
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder application, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             if (env.IsDevelopment())
             {
                 loggerFactory.AddConsole(LogLevel.Verbose);
-                app.UseDeveloperExceptionPage()
-                    .UseStatusCodePages();
+                
+                application.UseDeveloperExceptionPage()
+                    .UseStatusCodePages()
+                    .UseRuntimeInfoPage();
             }
 
-            app.UseStaticFiles()
+            application.UseStaticFiles()
                 .UseIdentity()
                 .UseMvc(routes =>
                 {
@@ -83,7 +98,7 @@ namespace E5R.Product.WebSite
                     );
                 });
 
-            SampleData.EnsureDatabaseAsync(app.ApplicationServices).Wait();
+            SampleData.EnsureDatabaseAsync(application.ApplicationServices).Wait();
         }
     }
 }

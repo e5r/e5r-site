@@ -1,0 +1,35 @@
+@using E5R.Product.WebSite.Data.ViewModel
+@addTagHelper "*, Microsoft.AspNet.Mvc.TagHelpers"
+@model SignInModel
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>SignIn</title>
+</head>
+<body>
+    <h1>SignIn</h1>
+    <form method="POST" asp-controller="Account" asp-action="SignIn">
+        <div asp-validation-summary="ValidationSummary.All" style="font-weight:bold"></div>
+        <label asp-for="UserName"></label>
+        <input asp-for="UserName" />
+        <span asp-validation-for="UserName" style="color:red"></span>
+        
+        <br />
+        
+        <label asp-for="Password"></label>
+        <input asp-for="Password" />
+        <span asp-validation-for="Password" style="color:red"></span>
+        
+        <br />
+        
+        <label asp-for="RememberMe"></label>
+        <input asp-for="RememberMe" />
+        
+        <br />
+        
+        <button type="submit">Sign in</button>
+    </form>
+</body>
+</html>
