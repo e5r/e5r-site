@@ -13,7 +13,7 @@ set SCM_DNVM_INSTALL_OPTIONS=-arch %SCM_DNX_ARCH% -r %SCM_DNX_RUNTIME%
 
 :: ----------------------
 :: KUDU Deployment Script
-:: Version: 1.0.1
+:: Version: 1.0.4
 :: ----------------------
 
 :: Prerequisites

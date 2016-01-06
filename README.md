@@ -3,6 +3,10 @@ E5R Development Team Site
 
 A web site for E5R Development Team. _(Under construction!)_
 
+Production: **http://e5r-site.azurewebsites.net**
+
+Staging: **http://e5r-site-staging.azurewebsites.net**
+
 ## Preparando o ambiente de desenvolvimento
 
 ### 1. Instale o ambiente ASP.NET 5.
