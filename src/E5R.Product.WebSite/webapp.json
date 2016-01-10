@@ -1,7 +1,11 @@
 {
     "Auth": {
-        "DefaultRootUser": "",
-        "DefaultRootPassword": "",
+        "DefaultRootUser": {
+            "UserName": "",
+            "Password": "",
+            "FirstName": "",
+            "LastName": ""
+        },
         "ConnectionString": ""
     },
     "Identity": {

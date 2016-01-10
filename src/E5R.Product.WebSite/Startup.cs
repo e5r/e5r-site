@@ -51,8 +51,10 @@ namespace E5R.Product.WebSite
 
             services.Configure<AuthOptions>(options =>
             {
-                options.DefaultRootUser = Configuration["Auth:DefaultRootUser"];
-                options.DefaultRootPassword = Configuration["Auth:DefaultRootPassword"];
+                options.DefaultRootUserName = Configuration["Auth:DefaultRootUser:UserName"];
+                options.DefaultRootPassword = Configuration["Auth:DefaultRootUser:Password"];
+                options.DefaultRootFirstName = Configuration["Auth:DefaultRootUser:FirstName"];
+                options.DefaultRootLastName = Configuration["Auth:DefaultRootUser:LastName"];
             });
 
             services.AddIdentity<User, IdentityRole>(options =>

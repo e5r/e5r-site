@@ -44,14 +44,26 @@ namespace E5R.Product.WebSite.Controllers
             if (ModelState.IsValid)
             {
                 var signed = await SignInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, false);
-
-                if (signed.Succeeded && Url.IsLocalUrl(urlReturn))
+                
+                if (signed.Succeeded)
                 {
-                    return Redirect(urlReturn);
-                }
-                else if (signed.Succeeded)
-                {
-                    return RedirectToAction("index", "home");
+                    var user = await UserManager.FindByNameAsync(model.UserName);
+                    
+                    if (!user.Accepted)
+                    {
+                        await SignInManager.SignOutAsync();
+                        ModelState.AddModelError(string.Empty, "Invalid username or password.");
+                        return View(model);
+                    }
+                    
+                    if (Url.IsLocalUrl(urlReturn))
+                    {
+                        return Redirect(urlReturn);
+                    }
+                    else
+                    {
+                        return RedirectToAction("index", "home");
+                    }
                 }
                 else
                 {

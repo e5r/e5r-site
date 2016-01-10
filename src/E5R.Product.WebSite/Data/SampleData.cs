@@ -39,11 +39,17 @@ namespace E5R.Product.WebSite.Data
                 await roleManager.CreateAsync(new IdentityRole(AuthOptions.ROOT_ROLE));
             }
 
-            var rootUser = await userManager.FindByNameAsync(options.DefaultRootUser);
+            var rootUser = await userManager.FindByNameAsync(options.DefaultRootUserName);
 
             if (rootUser == null)
             {
-                rootUser = new Model.User { UserName = options.DefaultRootUser };
+                rootUser = new Model.User
+                {
+                    UserName = options.DefaultRootUserName,
+                    FirstName = options.DefaultRootFirstName,
+                    LastName = options.DefaultRootLastName,
+                    Accepted = true
+                };
 
                 await userManager.CreateAsync(rootUser, options.DefaultRootPassword);
                 await userManager.AddToRoleAsync(rootUser, AuthOptions.ROOT_ROLE);

@@ -11,7 +11,9 @@ namespace E5R.Product.WebSite.Data.Context
         public const string APPLICATION_COOKIE = "ApplicationCookie";
         public const string COOKIE = "Interop";
         
-        public string DefaultRootUser { get; set; }
+        public string DefaultRootUserName { get; set; }
+        public string DefaultRootFirstName { get; set; }
+        public string DefaultRootLastName { get; set; }
         public string DefaultRootPassword { get; set; }
     }
 }
