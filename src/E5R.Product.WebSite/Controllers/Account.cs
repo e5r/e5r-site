@@ -92,11 +92,15 @@ namespace E5R.Product.WebSite.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SignUp()
+        public async Task<IActionResult> SignUp(object model)
         {
             // Send mail with Mailgun
             // * https://mailgun.com
             // * https://documentation.mailgun.com/quickstart-sending.html#send-via-api
+            
+            await SignInManager.SignOutAsync();
+            
+            return View(model);
         }
         
         // public static IRestResponse SendSimpleMessage()
