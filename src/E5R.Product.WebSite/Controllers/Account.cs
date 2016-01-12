@@ -127,6 +127,7 @@ namespace E5R.Product.WebSite.Controllers
         //     using Microsoft.AspNet.Http; 
         //     
         //     HttpClient client = new HttpClient();
+        //     // http://www.asp.net/web-api/overview/advanced/calling-a-web-api-from-a-net-client
         //     */
         //     
         //     /*
