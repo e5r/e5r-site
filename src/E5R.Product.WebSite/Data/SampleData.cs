@@ -20,6 +20,8 @@ namespace E5R.Product.WebSite.Data
         {
             using (var context = serviceProvider.GetRequiredService<AuthContext>())
             {
+                await context.Database.EnsureDeletedAsync();
+                
                 if (await context.Database.EnsureCreatedAsync())
                 {
                     await CreateRootUser(serviceProvider);
