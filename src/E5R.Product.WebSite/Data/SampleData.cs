@@ -31,31 +31,31 @@ namespace E5R.Product.WebSite.Data
 
         private static async Task CreateRootUser(IServiceProvider serviceProvider)
         {
-            var options = serviceProvider.GetRequiredService<IOptions<AuthOptions>>().Value;
+            var options = serviceProvider.GetRequiredService<IOptions<ProductOptions>>().Value;
 
             var userManager = serviceProvider.GetRequiredService<UserManager<User>>();
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
-            if (!await roleManager.RoleExistsAsync(AuthOptions.ROOT_ROLE))
+            if (!await roleManager.RoleExistsAsync(ProductOptions.AUTH_ROOT_ROLE))
             {
-                await roleManager.CreateAsync(new IdentityRole(AuthOptions.ROOT_ROLE));
+                await roleManager.CreateAsync(new IdentityRole(ProductOptions.AUTH_ROOT_ROLE));
             }
 
-            var rootUser = await userManager.FindByNameAsync(options.DefaultRootUserName);
+            var rootUser = await userManager.FindByNameAsync(options.DefaultRootUser.UserName);
 
             if (rootUser == null)
             {
                 rootUser = new Model.User
                 {
-                    UserName = options.DefaultRootUserName,
-                    FirstName = options.DefaultRootFirstName,
-                    LastName = options.DefaultRootLastName,
+                    UserName = options.DefaultRootUser.UserName,
+                    FirstName = options.DefaultRootUser.FirstName,
+                    LastName = options.DefaultRootUser.LastName,
                     Accepted = true
                 };
 
-                await userManager.CreateAsync(rootUser, options.DefaultRootPassword);
-                await userManager.AddToRoleAsync(rootUser, AuthOptions.ROOT_ROLE);
-                await userManager.AddClaimAsync(rootUser, new Claim(AuthOptions.ROOT_CLAIM, AuthOptions.CLAIM_ALLOWED));
+                await userManager.CreateAsync(rootUser, options.DefaultRootUser.Password);
+                await userManager.AddToRoleAsync(rootUser, ProductOptions.AUTH_ROOT_ROLE);
+                await userManager.AddClaimAsync(rootUser, new Claim(ProductOptions.AUTH_ROOT_CLAIM, ProductOptions.AUTH_CLAIM_ALLOWED));
             }
         }
     }

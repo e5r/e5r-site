@@ -1,12 +1,21 @@
 {
-    "Auth": {
-        "DefaultRootUser": {
-            "UserName": "",
-            "Password": "",
-            "FirstName": "",
-            "LastName": ""
-        },
-        "ConnectionString": ""
+    "E5R": {
+        "Product": {
+            "WebSite": {
+                "Auth": {
+                    "DefaultRootUser": {
+                        "UserName": "",
+                        "Password": "",
+                        "FirstName": "",
+                        "LastName": ""
+                    }
+                },
+                "Database": {
+                    "Type": "",
+                    "ConnectionString": ""
+                }
+            }
+        }
     },
     "Identity": {
         "Password": {
