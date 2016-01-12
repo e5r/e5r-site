@@ -14,17 +14,17 @@ namespace E5R.Product.WebSite.Controllers
     [Authorize]
     public class Profile : Controller
     {
-        private readonly AuthContext _authContext;
-        
         public Profile(AuthContext authContext)
         {
-            _authContext = authContext;
+            AuthContext = authContext;
         }
+        
+        private AuthContext AuthContext { get; set; }
         
         [HttpGet]
         public IActionResult Index()
         {
-            var user = _authContext.Users.SingleOrDefault(where => where.Id == User.GetUserId());
+            var user = AuthContext.Users.SingleOrDefault(where => where.Id == User.GetUserId());
 
             if (user == null)
             {

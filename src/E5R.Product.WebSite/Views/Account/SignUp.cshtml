@@ -1,0 +1,45 @@
+@using E5R.Product.WebSite.Data.ViewModel
+@using Microsoft.AspNet.Http;
+
+@model SignUpViewModel
+
+@addTagHelper "*, Microsoft.AspNet.Mvc.TagHelpers"
+
+<h1>SignUp</h1>
+@using (Html.BeginForm("SignUp", "Account", new { }, FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="ValidationSummary.All" style="font-weight:bold"></div>
+    
+    <label asp-for="FirstName"></label>
+    <input asp-for="FirstName" />
+    <span asp-validation-for="FirstName" style="color:red"></span>
+    
+    <br />
+    
+    <label asp-for="LastName"></label>
+    <input asp-for="LastName" />
+    <span asp-validation-for="LastName" style="color:red"></span>
+    
+    <br />
+    
+    <label asp-for="Email"></label>
+    <input asp-for="Email" />
+    <span asp-validation-for="Email" style="color:red"></span>
+    
+    <br />
+    
+    <label asp-for="Password"></label>
+    <input asp-for="Password" />
+    <span asp-validation-for="Password" style="color:red"></span>
+    
+    <br />
+    
+    <label asp-for="ConfirmPassword"></label>
+    <input asp-for="ConfirmPassword" />
+    <span asp-validation-for="ConfirmPassword" style="color:red"></span>
+    
+    <br />
+    
+    <button type="submit">Sign up</button>
+}

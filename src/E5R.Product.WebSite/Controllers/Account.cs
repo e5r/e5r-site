@@ -5,23 +5,30 @@ using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Authorization;
+using System.Linq;
 
 namespace E5R.Product.WebSite.Controllers
 {
     using Data.ViewModel;
     using Data.Model;
+    using Data.Context;
 
     [Authorize]
     public class Account : Controller
     {
-        public Account(UserManager<User> userManager, SignInManager<User> signInManager)
+        public Account(
+            UserManager<User> userManager,
+            SignInManager<User> signInManager,
+            AuthContext authContext)
         {
             UserManager = userManager;
             SignInManager = signInManager;
+            AuthContext = authContext;
         }
         
-        public UserManager<User> UserManager { get; set; }
-        public SignInManager<User> SignInManager { get; set; }
+        private UserManager<User> UserManager { get; set; }
+        private SignInManager<User> SignInManager { get; set; }
+        public AuthContext AuthContext { get; set; }
         
         [HttpGet]
         [AllowAnonymous]
@@ -62,7 +69,7 @@ namespace E5R.Product.WebSite.Controllers
                     }
                     else
                     {
-                        return RedirectToAction("index", "home");
+                        return RedirectToAction(nameof(Home.Index), "Home");
                     }
                 }
                 else
@@ -79,7 +86,7 @@ namespace E5R.Product.WebSite.Controllers
         {
             await SignInManager.SignOutAsync();
             
-            return RedirectToAction("index", "home");
+            return RedirectToAction(nameof(Home.Index), "Home");
         }
         
         [HttpGet]
@@ -92,53 +99,82 @@ namespace E5R.Product.WebSite.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SignUp(object model)
+        public async Task<IActionResult> SignUp(SignUpViewModel model)
         {
             // Send mail with Mailgun
             // * https://mailgun.com
             // * https://documentation.mailgun.com/quickstart-sending.html#send-via-api
-            
-            await SignInManager.SignOutAsync();
-            
+
+            if (ModelState.IsValid)
+            {
+                await SignInManager.SignOutAsync();
+
+                if (model.Password != model.ConfirmPassword)
+                {
+                    ModelState.AddModelError(string.Empty, "Invalid password confirmation.");
+                    return View(model);
+                }
+
+                var e5rNick = (
+                    model.FirstName.ElementAt(0)
+                    + (model.FirstName.Length - 2).ToString()
+                    + model.FirstName.ElementAt(model.FirstName.Length - 1)
+                    ).ToLower();
+
+                var e5rNickCount = AuthContext.Users.Count(c => c.UserName.Substring(0, 3) == e5rNick);
+
+                if (e5rNickCount > 0)
+                {
+                    e5rNick = $"{ e5rNick }{ e5rNickCount }";
+                }
+
+                var user = new User
+                {
+                    Accepted = false,
+                    UserName = e5rNick,
+                    Email = model.Email,
+                    FirstName = model.FirstName,
+                    LastName = model.LastName,
+                };
+
+                var result = await UserManager.CreateAsync(user, model.Password);
+
+                if (result.Succeeded)
+                {
+                    var confirmCode = await UserManager.GenerateEmailConfirmationTokenAsync(user);
+                    var callbackUrl = Url.Action(nameof(Account.ConfirmEmail), "Account", new { e5rNick = e5rNick, code = confirmCode }, HttpContext.Request.Scheme);
+
+                    await MessageServices.SendEmailAsync(model.Email, "E5R confirm account",
+                        $"Visit { callbackUrl } to confirm you account on E5R Development Team.");
+                        
+                    ViewData["e5rNick"] = e5rNick;
+
+                    return RedirectToAction(nameof(Account.WaitConfirmation), "Controller");
+                }
+
+                foreach (var e in result.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, e.Description);
+                }
+            }
+
             return View(model);
         }
         
-        // public static IRestResponse SendSimpleMessage()
-        // {
-        //     RestClient client = new RestClient();
-        //     client.BaseUrl = new Uri("https://api.mailgun.net/v3");
-        //     client.Authenticator =
-        //             new HttpBasicAuthenticator("api",
-        //                                        "YOUR_API_KEY");
-        //     RestRequest request = new RestRequest();
-        //     request.AddParameter("domain",
-        //                          "YOUR_DOMAIN_NAME", ParameterType.UrlSegment);
-        //     request.Resource = "{domain}/messages";
-        //     request.AddParameter("from", "Excited User <mailgun@YOUR_DOMAIN_NAME>");
-        //     request.AddParameter("to", "bar@example.com");
-        //     request.AddParameter("to", "YOU@YOUR_DOMAIN_NAME");
-        //     request.AddParameter("subject", "Hello");
-        //     request.AddParameter("text", "Testing some Mailgun awesomness!");
-        //     request.Method = Method.POST;
-        //     return client.Execute(request);
-        //     
-        //     /*
-        //     using System.Net.Http;
-        //     using Microsoft.AspNet.Http; 
-        //     
-        //     HttpClient client = new HttpClient();
-        //     // http://www.asp.net/web-api/overview/advanced/calling-a-web-api-from-a-net-client
-        //     */
-        //     
-        //     /*
-        //     curl -s --user 'api:YOUR_API_KEY' \
-        //         https://api.mailgun.net/v3/YOUR_DOMAIN_NAME/messages \
-        //         -F from='Excited User <mailgun@YOUR_DOMAIN_NAME>' \
-        //         -F to=YOU@YOUR_DOMAIN_NAME \
-        //         -F to=bar@example.com \
-        //         -F subject='Hello' \
-        //         -F text='Testing some Mailgun awesomness!'
-        //      */
-        // }
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task ConfirmEmail(string e5rNick, string code)
+        {
+            await SignInManager.SignOutAsync();
+        }
+        
+        [HttpGet]
+        [AllowAnonymous]
+        public string WaitConfirmation()
+        {
+            var e5rNick = ViewData["e5rNick"];
+            
+            return $"See you e-mail to confirm account. You nick name is \"{ e5rNick }\"";
+        }
     }
 }
