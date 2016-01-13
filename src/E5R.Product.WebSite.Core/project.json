@@ -1,0 +1,25 @@
+{
+    "title": "E5R.Product.WebSite.Core",
+    "version": "0.1.0-alpha3",
+    "description": "Core for a E5R Web Site",
+    "projectUrl": "https://github.com/e5r/e5r-site",
+    "copyright": "Copyright (c) E5R Development Team",
+    "authors": [
+        "E5R Development Team",
+        "Erlimar Silva Campos"
+    ],
+    "owners": [
+        "E5R Development Team"
+    ],
+    "tags": [
+        "e5r"
+    ],
+    "dependencies": {
+        "E5R.Product.WebSite.Abstractions": "",
+        "Microsoft.AspNet.Http": "1.0.0-rc1-final"
+    },
+    "frameworks": {
+        "dnx451": {},
+        "dnxcore50": {}
+    }
+}

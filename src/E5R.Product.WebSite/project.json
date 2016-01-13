@@ -16,6 +16,8 @@
         "e5r"
     ],
     "dependencies": {
+        "E5R.Product.WebSite.Abstractions": "",
+        "E5R.Product.WebSite.Core": "",
         "EntityFramework.Commands": "7.0.0-rc1-final",
         "EntityFramework.SQLite": "7.0.0-rc1-final",
         "EntityFramework.MicrosoftSqlServer": "7.0.0-rc1-final",

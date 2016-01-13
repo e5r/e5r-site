@@ -15,6 +15,8 @@ using System;
 
 namespace E5R.Product.WebSite
 {
+    using Abstractions.Services;
+    using Core.Services;
     using Data.Context;
     using Data.Model;
     using Data;
@@ -77,6 +79,7 @@ namespace E5R.Product.WebSite
 
         public void ConfigureServices(IServiceCollection services)
         {
+            // Configuring Database
             var dbType = Configuration[$"{ProductNs}:Database:Type"];
             var dbConnectionString = Configuration[$"{ProductNs}:Database:ConnectionString"];
             
@@ -115,6 +118,7 @@ namespace E5R.Product.WebSite
                 });
             }
 
+            // Initialzing Product Options
             services.Configure<ProductOptions>(options =>
             {
                 options.DefaultRootUser.UserName = Configuration[$"{ProductNs}:Auth:DefaultRootUser:UserName"];
@@ -123,6 +127,7 @@ namespace E5R.Product.WebSite
                 options.DefaultRootUser.LastName = Configuration[$"{ProductNs}:Auth:DefaultRootUser:LastName"];
             });
 
+            // Configuring Identity
             services.AddIdentity<User, IdentityRole>(options =>
             {
                 IdentityCookieOptions.ApplicationCookieAuthenticationType = ProductOptions.AUTH_APPLICATION_COOKIE;
@@ -136,6 +141,7 @@ namespace E5R.Product.WebSite
                 .AddEntityFrameworkStores<AuthContext>()
                 .AddDefaultTokenProviders();
 
+            // Configuring MVC
             services.ConfigureRouting(routeOptions =>
             {
                 routeOptions.AppendTrailingSlash = true;
@@ -143,6 +149,9 @@ namespace E5R.Product.WebSite
             });
 
             services.AddMvc();
+            
+            // Configuring Core Services
+            services.AddTransient<IEmailSender, MailgunEmailSender>();
         }
 
         public void Configure(IApplicationBuilder application, IHostingEnvironment env, ILoggerFactory loggerFactory)

@@ -9,6 +9,8 @@ using System.Linq;
 
 namespace E5R.Product.WebSite.Controllers
 {
+    using Abstractions.Services;
+    using Abstractions.Business;
     using Data.ViewModel;
     using Data.Model;
     using Data.Context;
@@ -19,16 +21,22 @@ namespace E5R.Product.WebSite.Controllers
         public Account(
             UserManager<User> userManager,
             SignInManager<User> signInManager,
-            AuthContext authContext)
+            AuthContext authContext,
+            IEmailSender emailSender,
+            IUserBusiness userBusiness)
         {
             UserManager = userManager;
             SignInManager = signInManager;
             AuthContext = authContext;
+            EmailSender = emailSender;
+            UserBusiness = userBusiness;
         }
         
         private UserManager<User> UserManager { get; set; }
         private SignInManager<User> SignInManager { get; set; }
         public AuthContext AuthContext { get; set; }
+        public IEmailSender EmailSender { get; set; }
+        public IUserBusiness UserBusiness { get; set; }
         
         [HttpGet]
         [AllowAnonymous]
@@ -101,10 +109,6 @@ namespace E5R.Product.WebSite.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SignUp(SignUpViewModel model)
         {
-            // Send mail with Mailgun
-            // * https://mailgun.com
-            // * https://documentation.mailgun.com/quickstart-sending.html#send-via-api
-
             if (ModelState.IsValid)
             {
                 await SignInManager.SignOutAsync();
@@ -114,19 +118,11 @@ namespace E5R.Product.WebSite.Controllers
                     ModelState.AddModelError(string.Empty, "Invalid password confirmation.");
                     return View(model);
                 }
-
-                var e5rNick = (
-                    model.FirstName.ElementAt(0)
-                    + (model.FirstName.Length - 2).ToString()
-                    + model.FirstName.ElementAt(model.FirstName.Length - 1)
-                    ).ToLower();
-
-                var e5rNickCount = AuthContext.Users.Count(c => c.UserName.Substring(0, 3) == e5rNick);
-
-                if (e5rNickCount > 0)
+                
+                var e5rNick = await UserBusiness.GenerateNickAsync(model.FirstName, (string nick) =>
                 {
-                    e5rNick = $"{ e5rNick }{ e5rNickCount }";
-                }
+                    return AuthContext.Users.Count(c => c.UserName.Substring(0, 3) == nick);
+                });
 
                 var user = new User
                 {
@@ -144,7 +140,7 @@ namespace E5R.Product.WebSite.Controllers
                     var confirmCode = await UserManager.GenerateEmailConfirmationTokenAsync(user);
                     var callbackUrl = Url.Action(nameof(Account.ConfirmEmail), "Account", new { e5rNick = e5rNick, code = confirmCode }, HttpContext.Request.Scheme);
 
-                    await MessageServices.SendEmailAsync(model.Email, "E5R confirm account",
+                    await EmailSender.SendEmailAsync(model.Email, "E5R confirm account",
                         $"Visit { callbackUrl } to confirm you account on E5R Development Team.");
                         
                     ViewData["e5rNick"] = e5rNick;

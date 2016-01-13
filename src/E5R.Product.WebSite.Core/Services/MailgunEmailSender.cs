@@ -3,13 +3,20 @@
 
 using System.Threading.Tasks;
 
-namespace E5R.Product.WebSite
+namespace E5R.Product.WebSite.Core.Services
 {
-    public class MessageServices
+    using System;
+    using Abstractions.Services;
+
+    public class MailgunEmailSender : IEmailSender
     {
-        public async static Task SendEmailAsync(string email, string subject, string message)
+        public Task SendEmailAsync(string email, string subject, string message)
         {
+            throw new NotImplementedException();
             
+            // Send mail with Mailgun
+            // * https://mailgun.com
+            // * https://documentation.mailgun.com/quickstart-sending.html#send-via-api
         }
         
         // public static IRestResponse SendSimpleMessage()
