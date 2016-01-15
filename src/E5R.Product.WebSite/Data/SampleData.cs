@@ -49,8 +49,7 @@ namespace E5R.Product.WebSite.Data
                 {
                     UserName = options.DefaultRootUser.UserName,
                     FirstName = options.DefaultRootUser.FirstName,
-                    LastName = options.DefaultRootUser.LastName,
-                    Accepted = true
+                    LastName = options.DefaultRootUser.LastName
                 };
 
                 await userManager.CreateAsync(rootUser, options.DefaultRootUser.Password);

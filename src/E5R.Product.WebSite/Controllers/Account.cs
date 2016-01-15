@@ -68,12 +68,14 @@ namespace E5R.Product.WebSite.Controllers
                 {
                     var user = await UserManager.FindByNameAsync(model.UserName);
                     
-                    if (!user.Accepted)
+                    if (!await UserManager.IsEmailConfirmedAsync(user))
                     {
                         await SignInManager.SignOutAsync();
                         ModelState.AddModelError(string.Empty, "Invalid username or password.");
                         return View(model);
                     }
+                    
+                    Logger.LogInformation($"User [{ model.UserName }] logged in");
                     
                     if (Url.IsLocalUrl(urlReturn))
                     {
@@ -98,6 +100,8 @@ namespace E5R.Product.WebSite.Controllers
         {
             await SignInManager.SignOutAsync();
             
+            Logger.LogInformation("User logged out");
+            
             return RedirectToAction(nameof(Home.Index), nameof(Home));
         }
         
@@ -113,8 +117,6 @@ namespace E5R.Product.WebSite.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SignUp(SignUpViewModel model)
         {
-            Logger.LogVerbose("Starting SignUp action");
-            
             if (ModelState.IsValid)
             {
                 await SignInManager.SignOutAsync();
@@ -131,7 +133,6 @@ namespace E5R.Product.WebSite.Controllers
                     return View(model);
                 }
                 
-                Logger.LogVerbose($"Generating nick name for [{ model.FirstName }]");
                 var e5rNick = await UserBusiness.GenerateNickAsync(model.FirstName, (string nick) =>
                 {
                     var count = AuthContext.Users.Count(c => c.UserName.Substring(1, 3) == nick);
@@ -140,63 +141,43 @@ namespace E5R.Product.WebSite.Controllers
                     
                     return count;
                 });
+
                 Logger.LogVerbose($"Nick name generated is [{ e5rNick }]");
 
                 var user = new User
                 {
-                    Accepted = false,
                     UserName = e5rNick,
                     Email = model.Email,
                     FirstName = model.FirstName,
                     LastName = model.LastName,
                 };
                 
-                var userSerialized = string.Empty;
-                
-                userSerialized += "{";
-                userSerialized += $"    Accepted: { user.Accepted },";
-                userSerialized += $"    UserName: { user.UserName },";
-                userSerialized += $"    Email: { user.Email },";
-                userSerialized += $"    FirstName: { user.FirstName },";
-                userSerialized += $"    LastName: { user.LastName }";
-                userSerialized += "}";
-                
-                Logger.LogVerbose($"User received: { userSerialized }");
-                
-
                 var result = await UserManager.CreateAsync(user, model.Password);
                 
-                Logger.LogVerbose($"Create result: { result.Succeeded }");
-
                 if (result.Succeeded)
                 {
+                    Logger.LogInformation("User created a new account with password.");
+                    
                     var confirmCode = await UserManager.GenerateEmailConfirmationTokenAsync(user);
                     var callbackUrl = Url.Action(nameof(Account.ConfirmEmail), nameof(Account), new { NickName = e5rNick, ConfirmationToken = confirmCode }, HttpContext.Request.Scheme);
                     
-                    Logger.LogVerbose($"Confirm code: { confirmCode }");
-                    Logger.LogVerbose($"Callback url: { callbackUrl }");
-                    
-                    Logger.LogVerbose("Sending e-mail...");
-
                     await EmailSender.SendEmailAsync(model.Email, "E5R confirm account",
                         $"Visit { callbackUrl } to confirm you account on E5R Development Team.");
                         
-                    TempData["e5rNick"] = e5rNick;
-                    TempData["confirmCode"] = confirmCode;
+                    TempData["NickName"] = e5rNick;
 
                     return RedirectToAction(nameof(Account.WaitConfirmation), nameof(Account));
                 }
                 
-                Logger.LogVerbose("Returning errors.");
+                Logger.LogVerbose("Create user return a errors");
 
                 foreach (var e in result.Errors)
                 {
+                    Logger.LogVerbose($"  -> { e.Description }");
                     ModelState.AddModelError(string.Empty, e.Description);
                 }
             }
             
-            Logger.LogVerbose("Showing view for SignUp action");
-
             return View(model);
         }
         
@@ -237,12 +218,11 @@ namespace E5R.Product.WebSite.Controllers
         
         [HttpGet]
         [AllowAnonymous]
-        public string WaitConfirmation()
+        public IActionResult WaitConfirmation()
         {
-            var e5rNick = TempData["e5rNick"];
-            var confirmCode = TempData["confirmCode"];
+            ViewBag.NickName = TempData["NickName"];
             
-            return $"See you e-mail to confirm account. You nick name is \"{ e5rNick }\"\n Code: { confirmCode }";
+            return View();
         }
     }
 }
