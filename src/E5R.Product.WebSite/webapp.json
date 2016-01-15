@@ -11,19 +11,27 @@
                     }
                 },
                 "Database": {
-                    "Type": "",
+                    "Type": "SQLite|SQLServer",
                     "ConnectionString": ""
+                },
+                "Addins": {
+                    "Mailgun": {
+                        "BaseAddress": "",
+                        "Domain": "",
+                        "From": "",
+                        "AppKey": ""
+                    }
                 }
             }
         }
     },
     "Identity": {
         "Password": {
-            "RequireDigit": "false",
-            "RequireLowercase": "false",
-            "RequireUppercase": "false",
-            "RequireNonLetterOrDigit": "false",
-            "RequiredLength": "false"
+            "RequireDigit": "",
+            "RequireLowercase": "",
+            "RequireUppercase": "",
+            "RequireNonLetterOrDigit": "",
+            "RequiredLength": ""
         }
     }
 }

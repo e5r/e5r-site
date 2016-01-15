@@ -18,6 +18,7 @@
     "dependencies": {
         "E5R.Product.WebSite.Abstractions": "",
         "E5R.Product.WebSite.Core": "",
+        "E5R.Product.WebSite.Addins": "",
         "EntityFramework.Commands": "7.0.0-rc1-final",
         "EntityFramework.SQLite": "7.0.0-rc1-final",
         "EntityFramework.MicrosoftSqlServer": "7.0.0-rc1-final",
@@ -31,13 +32,14 @@
         "Microsoft.AspNet.Server.Kestrel": "1.0.0-rc1-final",
         "Microsoft.AspNet.IISPlatformHandler": "1.0.0-rc1-final",
         "Microsoft.AspNet.Diagnostics": "1.0.0-rc1-final",
+        "Microsoft.AspNet.Session": "1.0.0-rc1-final",
         "Microsoft.Extensions.Configuration": "1.0.0-rc1-final",
         "Microsoft.Extensions.Configuration.Json": "1.0.0-rc1-final",
         "Microsoft.Extensions.Configuration.EnvironmentVariables": "1.0.0-rc1-final",
         "Microsoft.Extensions.Configuration.UserSecrets": "1.0.0-rc1-final",
         "Microsoft.Extensions.Logging": "1.0.0-rc1-final",
         "Microsoft.Extensions.Logging.Console": "1.0.0-rc1-final",
-        "Microsoft.Extensions.Logging.Debug": "1.0.0-rc1-final"
+        "Microsoft.Extensions.Caching.Memory": "1.0.0-rc1-final"
     },
     "frameworks": {
         "dnx451": {},

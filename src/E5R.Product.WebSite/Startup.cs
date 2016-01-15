@@ -15,8 +15,10 @@ using System;
 
 namespace E5R.Product.WebSite
 {
+    using Abstractions.Business;
     using Abstractions.Services;
-    using Core.Services;
+    using Core.Business;
+    using Addins.Senders;
     using Data.Context;
     using Data.Model;
     using Data;
@@ -38,8 +40,8 @@ namespace E5R.Product.WebSite
             }
             else
             {
-                loggerFactory.MinimumLevel = LogLevel.Information;
-                loggerFactory.AddConsole();
+                loggerFactory.MinimumLevel = LogLevel.Verbose;
+                loggerFactory.AddConsole((n,l) => l >= loggerFactory.MinimumLevel);
             }
             
             Logger = loggerFactory.CreateLogger(this.GetType().Namespace.ToString());
@@ -53,7 +55,7 @@ namespace E5R.Product.WebSite
                     .Replace('.', ':');
             }
             
-            Logger.LogInformation($"ProductNs = { ProductNs }");
+            Logger.LogVerbose($"ProductNs = { ProductNs }");
             
             var builder = new ConfigurationBuilder()
                 .AddJsonFile(CONFIG_FILE_GLOBAL)
@@ -61,7 +63,7 @@ namespace E5R.Product.WebSite
 
             if (env.IsDevelopment())
             {
-                Logger.LogInformation("Development environment detected.");
+                Logger.LogVerbose("Development environment detected.");
                 
                 builder.AddUserSecrets();
             }
@@ -83,8 +85,8 @@ namespace E5R.Product.WebSite
             var dbType = Configuration[$"{ProductNs}:Database:Type"];
             var dbConnectionString = Configuration[$"{ProductNs}:Database:ConnectionString"];
             
-            Logger.LogInformation($"Database Type = {dbType}");
-            Logger.LogInformation($"Connection String = {dbConnectionString}");
+            Logger.LogVerbose($"Database Type = {dbType}");
+            Logger.LogVerbose($"Connection String = {dbConnectionString}");
             
             if (AcceptedDatabaseTypes.Count(c => string.Compare(c, dbType, true) == 0) != 1)
             {
@@ -118,7 +120,9 @@ namespace E5R.Product.WebSite
                 });
             }
 
-            // Initialzing Product Options
+            // Configuring Options
+            services.AddOptions();
+            
             services.Configure<ProductOptions>(options =>
             {
                 options.DefaultRootUser.UserName = Configuration[$"{ProductNs}:Auth:DefaultRootUser:UserName"];
@@ -126,10 +130,24 @@ namespace E5R.Product.WebSite
                 options.DefaultRootUser.FirstName = Configuration[$"{ProductNs}:Auth:DefaultRootUser:FirstName"];
                 options.DefaultRootUser.LastName = Configuration[$"{ProductNs}:Auth:DefaultRootUser:LastName"];
             });
+            
+            services.Configure<MailgunOptions>(options => {
+                options.BaseAddress = Configuration[$"{ProductNs}:Addins:Mailgun:BaseAddress"];
+                options.Domain = Configuration[$"{ProductNs}:Addins:Mailgun:Domain"];
+                options.From = Configuration[$"{ProductNs}:Addins:Mailgun:From"];
+                options.AppKey = Configuration[$"{ProductNs}:Addins:Mailgun:AppKey"];
+            });
 
             // Configuring Identity
             services.AddIdentity<User, IdentityRole>(options =>
             {
+                // TODO: Explicit reading is necessary?
+                options.Password.RequireDigit = bool.Parse(Configuration["Identity:Password:RequireDigit"] ?? options.Password.RequireDigit.ToString());
+                options.Password.RequireLowercase = bool.Parse(Configuration["Identity:Password:RequireLowercase"] ?? options.Password.RequireLowercase.ToString());
+                options.Password.RequireUppercase = bool.Parse(Configuration["Identity:Password:RequireUppercase"] ?? options.Password.RequireUppercase.ToString());
+                options.Password.RequireNonLetterOrDigit = bool.Parse(Configuration["Identity:Password:RequireNonLetterOrDigit"] ?? options.Password.RequireNonLetterOrDigit.ToString());
+                options.Password.RequiredLength = int.Parse(Configuration["Identity:Password:RequiredLength"] ?? options.Password.RequiredLength.ToString());
+                
                 IdentityCookieOptions.ApplicationCookieAuthenticationType = ProductOptions.AUTH_APPLICATION_COOKIE;
                 options.Cookies.ApplicationCookieAuthenticationScheme = ProductOptions.AUTH_APPLICATION_COOKIE;
                 options.Cookies.ApplicationCookie.AuthenticationScheme = ProductOptions.AUTH_APPLICATION_COOKIE;
@@ -141,7 +159,10 @@ namespace E5R.Product.WebSite
                 .AddEntityFrameworkStores<AuthContext>()
                 .AddDefaultTokenProviders();
 
-            // Configuring MVC
+            // Configuring ASP.NET and MVC
+            services.AddSession();
+            services.AddCaching();
+            
             services.ConfigureRouting(routeOptions =>
             {
                 routeOptions.AppendTrailingSlash = true;
@@ -150,7 +171,8 @@ namespace E5R.Product.WebSite
 
             services.AddMvc();
             
-            // Configuring Core Services
+            // Configuring Application Services
+            services.AddTransient<IUserBusiness, UserBusiness>();
             services.AddTransient<IEmailSender, MailgunEmailSender>();
         }
 
@@ -165,7 +187,8 @@ namespace E5R.Product.WebSite
             
             application.UseIISPlatformHandler(options => options.AuthenticationDescriptions.Clear());
 
-            application.UseStaticFiles()
+            application.UseSession()
+                .UseStaticFiles()
                 .UseIdentity()
                 .UseMvc(routes =>
                 {

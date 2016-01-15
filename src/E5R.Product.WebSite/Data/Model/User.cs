@@ -9,6 +9,8 @@ namespace E5R.Product.WebSite.Data.Model
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }
+        
+        // TODO: Move to Claim
         public bool Accepted { get; set; }
     }
 }
