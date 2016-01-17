@@ -1,6 +1,7 @@
 // Copyright (c) E5R Development Team. All rights reserved.
 // Licensed under the Apache License, Version 2.0. More license information in LICENSE.txt.
 
+using System;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
 using Microsoft.AspNet.Identity;
@@ -161,8 +162,15 @@ namespace E5R.Product.WebSite.Controllers
                     var confirmCode = await UserManager.GenerateEmailConfirmationTokenAsync(user);
                     var callbackUrl = Url.Action(nameof(Account.ConfirmEmail), nameof(Account), new { NickName = e5rNick, ConfirmationToken = confirmCode }, HttpContext.Request.Scheme);
                     
-                    await EmailSender.SendEmailAsync(model.Email, "E5R confirm account",
-                        $"Visit { callbackUrl } to confirm you account on E5R Development Team.");
+                    try
+                    {
+                        await EmailSender.SendEmailAsync(model.Email, "E5R confirm account",
+                            $"Visit { callbackUrl } to confirm you account on E5R Development Team.");
+                    }
+                    catch (Exception e)
+                    {
+                        throw new Exception("Huston, i have a problem!", e);
+                    }
                         
                     TempData["NickName"] = e5rNick;
 
