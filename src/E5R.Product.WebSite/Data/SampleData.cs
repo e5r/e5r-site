@@ -8,6 +8,7 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.OptionsModel;
+using Microsoft.Data.Entity;
 
 namespace E5R.Product.WebSite.Data
 {
@@ -20,12 +21,8 @@ namespace E5R.Product.WebSite.Data
         {
             using (var context = serviceProvider.GetRequiredService<AuthContext>())
             {
-                //await context.Database.EnsureDeletedAsync();
-                
-                if (await context.Database.EnsureCreatedAsync())
-                {
-                    await CreateRootUser(serviceProvider);
-                }
+                await context.Database.MigrateAsync();
+                await CreateRootUser(serviceProvider);
             }
         }
 
