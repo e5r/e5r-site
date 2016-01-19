@@ -1,3 +1,19 @@
+0.1.0-alpha4
+============
+
+* Projeto componentizado
+* Suporte para implantação contínua no Windows Azure aprimorado
+* Adicionado suporte para:
+  - Escolha DBMS (SQLite ou SQLServer)
+  - EF Migrations
+  - Addin para envio de e-mails com Mailgun (https://mailgun.com) 
+* Páginas adicionadas
+  - Cadastro: *account/signup*
+* Informações de licença adicionadas
+  - LICENSE.txt
+  - Cabeçalho em cada arquivo .CS
+* Script **watch** renomeado para **run-dev**
+
 0.1.0-alpha3
 ============
 

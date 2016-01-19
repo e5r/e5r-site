@@ -74,7 +74,7 @@ cp 'src/E5R.Product.WebSite/webapp.json' 'src/E5R.Product.WebSite/webapp.{env_na
 Preencha os dados no novo arquivo que acaba de criar, e faça o upload do mesmo na pasta de aplicação
 no Azure.
 
-Ex: **D:\home\site\approot\packages\E5R.Product.WebSite\0.1.0-alpha3\root\webapp.{env_name}.json**:
+Ex: **D:\home\site\approot\packages\E5R.Product.WebSite\0.1.0-alpha4\root\webapp.{env_name}.json**:
 
 
 ### 3. Reinicie o site no Azure
