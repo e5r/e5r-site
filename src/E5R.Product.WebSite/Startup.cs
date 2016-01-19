@@ -8,6 +8,7 @@ using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.PlatformAbstractions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Data.Entity;
 using System.Linq;
@@ -28,7 +29,9 @@ namespace E5R.Product.WebSite
         const string CONFIG_FILE_GLOBAL = "webapp.json";
         const string CONFIG_FILE_ENVIRONMENT = "webapp.{ENV}.json";
         
-        public Startup(IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public static void Main(string[] args) => WebApplication.Run<Startup>(args);
+        
+        public Startup(IHostingEnvironment env, IApplicationEnvironment appEnv, ILoggerFactory loggerFactory)
         {
             if (env.IsProduction())
             {
@@ -58,6 +61,7 @@ namespace E5R.Product.WebSite
             Logger.LogVerbose($"ProductNs = { ProductNs }");
             
             var builder = new ConfigurationBuilder()
+                .SetBasePath(appEnv.ApplicationBasePath)
                 .AddJsonFile(CONFIG_FILE_GLOBAL)
                 .AddJsonFile(CONFIG_FILE_ENVIRONMENT.Replace("{ENV}", env.EnvironmentName), true);
 
