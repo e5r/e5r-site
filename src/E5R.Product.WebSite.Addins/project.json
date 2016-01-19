@@ -1,0 +1,28 @@
+{
+    "title": "E5R.Product.WebSite.Addins",
+    "version": "0.1.0-alpha3",
+    "description": "Addins for a E5R Web Site",
+    "projectUrl": "https://github.com/e5r/e5r-site",
+    "copyright": "Copyright (c) E5R Development Team",
+    "authors": [
+        "E5R Development Team",
+        "Erlimar Silva Campos"
+    ],
+    "owners": [
+        "E5R Development Team"
+    ],
+    "tags": [
+        "e5r"
+    ],
+    "dependencies": {
+        "E5R.Product.WebSite.Abstractions": "",
+        "E5R.Product.WebSite.Core": "",
+        "Microsoft.Extensions.Logging.Abstractions": "1.0.0-rc1-final",
+        "Microsoft.Extensions.OptionsModel": "1.0.0-rc1-final",
+        "System.Net.Http": "4.0.1-beta-23516"
+    },
+    "frameworks": {
+        "dnx451": {},
+        "dnxcore50": {}
+    }
+}

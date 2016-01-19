@@ -12,18 +12,29 @@ IF %ERRORLEVEL% NEQ 0 (
 
 where dnx-watch 2>nul >nul
 IF %ERRORLEVEL% NEQ 0 (
-    echo Require DnxWatcher tool. Please install with command
+    echo Installing DnxWatcher tool...
+    call dnu commands install Microsoft.Dnx.Watcher 2>nul >nul
+)
+
+where dnx-watch 2>nul >nul
+IF %ERRORLEVEL% NEQ 0 (
+    echo Require DnxWatcher tool. Please install with manual command^:
     echo dnu commands install Microsoft.Dnx.Watcher
     goto :error
 )
 
 where user-secret 2>nul >nul
 IF %ERRORLEVEL% NEQ 0 (
-    echo Require SecretManager tool. Please install with command
+    echo Installing SecretManager tool...
+    call dnu commands install Microsoft.Extensions.SecretManager 2>nul >nul
+)
+
+where user-secret 2>nul >nul
+IF %ERRORLEVEL% NEQ 0 (
+    echo Require SecretManager tool. Please install with manual command^:
     echo dnu commands install Microsoft.Extensions.SecretManager
     goto :error
 )
-
 
 call dnx-watch --project src\E5R.Product.WebSite --dnx-args web
 

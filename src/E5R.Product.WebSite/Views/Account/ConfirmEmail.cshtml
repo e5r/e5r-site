@@ -1,0 +1,19 @@
+@using E5R.Product.WebSite.Data.ViewModel
+@using Microsoft.AspNet.Http;
+
+@model ConfirmEmailViewModel
+
+@addTagHelper "*, Microsoft.AspNet.Mvc.TagHelpers"
+
+<h1>E-mail confirmation</h1>
+
+@if(Model.Confirmed)
+{
+    <p>
+        Thank you <strong>@Model.FirstName</strong> for confirming your email. Please <a asp-controller="account" asp-action="signin">Click here to Sign in</a>.
+    </p>
+    <p>you nick name is <strong>@Model.NickName</strong></p>
+} else {
+    <h3>Errors:</h3>
+    <div asp-validation-summary="ValidationSummary.All" style="font-weight:bold"></div>
+}
