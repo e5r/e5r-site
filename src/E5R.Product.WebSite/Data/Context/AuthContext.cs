@@ -3,6 +3,7 @@
 
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Data.Entity;
+using Microsoft.Data.Entity.Metadata;
 
 namespace E5R.Product.WebSite.Data.Context
 {
@@ -10,16 +11,19 @@ namespace E5R.Product.WebSite.Data.Context
     
     public class AuthContext : IdentityDbContext<Model.User>
     {
+        public DbSet<UserProfile> UserProfiles { get; set; }
+        
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            builder.Entity<User>().Property(m => m.FirstName)
-                .IsRequired()
-                .HasMaxLength(20);
-
-            builder.Entity<User>().Property(m => m.LastName)
-                .IsRequired()
-                .HasMaxLength(60);
+            builder.Entity<User>()
+                .HasOne(u => u.Profile)
+                .WithOne(p => p.User)
+                .HasForeignKey<UserProfile>(p => p.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
                 
+            builder.Entity<UserProfile>()
+                .HasKey(p => p.UserId);
+            
             base.OnModelCreating(builder);
         }
     }

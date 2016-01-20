@@ -148,9 +148,14 @@ namespace E5R.Product.WebSite.Controllers
                 var user = new User
                 {
                     UserName = e5rNick,
-                    Email = model.Email,
+                    Email = model.Email
+                };
+
+                user.Profile = new UserProfile
+                {
                     FirstName = model.FirstName,
                     LastName = model.LastName,
+                    User = user
                 };
                 
                 var result = await UserManager.CreateAsync(user, model.Password);
@@ -210,7 +215,7 @@ namespace E5R.Product.WebSite.Controllers
                 if (result.Succeeded)
                 {
                     model.Confirmed = true;
-                    model.FirstName = user.FirstName;
+                    model.FirstName = user.Profile.FirstName;
                 }
                 
                 Logger.LogVerbose("Confirmation errors.");

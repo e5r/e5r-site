@@ -7,7 +7,6 @@ namespace E5R.Product.WebSite.Data.Model
 {
     public class User : IdentityUser
     {
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
+        public UserProfile Profile { get; set; }
     }
 }
