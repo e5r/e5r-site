@@ -7,8 +7,6 @@ namespace E5R.Product.WebSite
     {
         public string UserName { get; set; }
         public string Password { get; set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
     }
     
     public class DatabaseOptions {
@@ -23,6 +21,7 @@ namespace E5R.Product.WebSite
         public const string AUTH_CLAIM_ALLOWED = "Allowed";
         public const string AUTH_APPLICATION_COOKIE = "ApplicationCookie";
         public const string AUTH_COOKIE = "Interop";
+        public const string AUTH_USER_TEMP_PREFIX = "tempuser";
                 
         public DefaultRootUserOptions DefaultRootUser { get; set; } = new DefaultRootUserOptions();
         public DatabaseOptions Database { get; set; } = new DatabaseOptions();

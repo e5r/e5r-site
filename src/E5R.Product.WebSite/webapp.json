@@ -5,9 +5,7 @@
                 "Auth": {
                     "DefaultRootUser": {
                         "UserName": "",
-                        "Password": "",
-                        "FirstName": "",
-                        "LastName": ""
+                        "Password": ""
                     }
                 },
                 "Database": {

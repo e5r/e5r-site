@@ -30,7 +30,6 @@ namespace E5R.Product.WebSite.Data
         {
             var options = serviceProvider.GetRequiredService<IOptions<ProductOptions>>().Value;
             var authContext = serviceProvider.GetRequiredService<AuthContext>(); 
-
             var userManager = serviceProvider.GetRequiredService<UserManager<User>>();
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
@@ -41,29 +40,16 @@ namespace E5R.Product.WebSite.Data
 
             var rootUser = await userManager.FindByNameAsync(options.DefaultRootUser.UserName);
 
-            if (rootUser == null || rootUser.Profile == null)
+            if (rootUser == null)
             {
-                if (rootUser == null)
+                rootUser = new Model.User
                 {
-                    rootUser = new Model.User
-                    {
-                        UserName = options.DefaultRootUser.UserName
-                    };
-
-                    await userManager.CreateAsync(rootUser, options.DefaultRootUser.Password);
-                    await userManager.AddToRoleAsync(rootUser, ProductOptions.AUTH_ROOT_ROLE);
-                    await userManager.AddClaimAsync(rootUser, new Claim(ProductOptions.AUTH_ROOT_CLAIM, ProductOptions.AUTH_CLAIM_ALLOWED));
-                }
-                
-                var profile = new UserProfile
-                {
-                    FirstName = options.DefaultRootUser.FirstName,
-                    LastName = options.DefaultRootUser.LastName,
-                    User = rootUser
+                    UserName = options.DefaultRootUser.UserName
                 };
-                
-                authContext.UserProfiles.Add(profile);
-                await authContext.SaveChangesAsync();
+
+                await userManager.CreateAsync(rootUser, options.DefaultRootUser.Password);
+                await userManager.AddToRoleAsync(rootUser, ProductOptions.AUTH_ROOT_ROLE);
+                await userManager.AddClaimAsync(rootUser, new Claim(ProductOptions.AUTH_ROOT_CLAIM, ProductOptions.AUTH_CLAIM_ALLOWED));
             }
         }
     }

@@ -131,8 +131,6 @@ namespace E5R.Product.WebSite
             {
                 options.DefaultRootUser.UserName = Configuration[$"{ProductNs}:Auth:DefaultRootUser:UserName"];
                 options.DefaultRootUser.Password = Configuration[$"{ProductNs}:Auth:DefaultRootUser:Password"];
-                options.DefaultRootUser.FirstName = Configuration[$"{ProductNs}:Auth:DefaultRootUser:FirstName"];
-                options.DefaultRootUser.LastName = Configuration[$"{ProductNs}:Auth:DefaultRootUser:LastName"];
             });
             
             services.Configure<MailgunOptions>(options => {

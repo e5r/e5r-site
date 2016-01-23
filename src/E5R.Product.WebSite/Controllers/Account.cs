@@ -134,20 +134,12 @@ namespace E5R.Product.WebSite.Controllers
                     return View(model);
                 }
                 
-                var e5rNick = await UserBusiness.GenerateNickAsync(model.FirstName, (string nick) =>
-                {
-                    var count = AuthContext.Users.Count(c => c.UserName.Substring(1, 3) == nick);
-                    
-                    Logger.LogVerbose($"Callback calc Nick name count for [{ nick }] result [{ count }]");
-                    
-                    return count;
-                });
-
-                Logger.LogVerbose($"Nick name generated is [{ e5rNick }]");
-
+                // Generate temporary username
+                var tempUserName = string.Concat(ProductOptions.AUTH_USER_TEMP_PREFIX, Guid.NewGuid().ToString("N"));
+                
                 var user = new User
                 {
-                    UserName = e5rNick,
+                    UserName = tempUserName,
                     Email = model.Email
                 };
 
@@ -158,6 +150,11 @@ namespace E5R.Product.WebSite.Controllers
                     User = user
                 };
                 
+                if (await UserManager.FindByNameAsync(user.UserName) != null)
+                {
+                    throw new Exception("Houston, i have a problem! Could not deduct a temporary username. Try again.");
+                }
+                
                 var result = await UserManager.CreateAsync(user, model.Password);
                 
                 if (result.Succeeded)
@@ -165,7 +162,7 @@ namespace E5R.Product.WebSite.Controllers
                     Logger.LogInformation("User created a new account with password.");
                     
                     var confirmCode = await UserManager.GenerateEmailConfirmationTokenAsync(user);
-                    var callbackUrl = Url.Action(nameof(Account.ConfirmEmail), nameof(Account), new { NickName = e5rNick, ConfirmationToken = confirmCode }, HttpContext.Request.Scheme);
+                    var callbackUrl = Url.Action(nameof(Account.ConfirmEmail), nameof(Account), new { TempName = user.UserName, ConfirmationToken = confirmCode }, HttpContext.Request.Scheme);
                     
                     try
                     {
@@ -174,11 +171,9 @@ namespace E5R.Product.WebSite.Controllers
                     }
                     catch (Exception e)
                     {
-                        throw new Exception("Huston, i have a problem!", e);
+                        throw new Exception("Houston, i have a problem!", e);
                     }
                         
-                    TempData["NickName"] = e5rNick;
-
                     return RedirectToAction(nameof(Account.WaitConfirmation), nameof(Account));
                 }
                 
@@ -202,11 +197,11 @@ namespace E5R.Product.WebSite.Controllers
             {
                 await SignInManager.SignOutAsync();
                 
-                var user = AuthContext.Users.SingleOrDefault(w => w.UserName == model.NickName);
+                var user = AuthContext.Users.SingleOrDefault(w => w.UserName == model.TempName);
                 
                 if (user == null)
                 {
-                    ModelState.AddModelError(string.Empty, $"User [{ model.NickName }] not found!");
+                    ModelState.AddModelError(string.Empty, $"User not found!");
                     return View(model);
                 }
                 
@@ -218,10 +213,11 @@ namespace E5R.Product.WebSite.Controllers
                     model.FirstName = user.Profile.FirstName;
                 }
                 
-                Logger.LogVerbose("Confirmation errors.");
+                Logger.LogVerbose("Confirmation errors:");
 
                 foreach (var e in result.Errors)
                 {
+                    Logger.LogVerbose($"  -> { e.Description }");
                     ModelState.AddModelError(string.Empty, e.Description);
                 }
             }
@@ -233,8 +229,6 @@ namespace E5R.Product.WebSite.Controllers
         [AllowAnonymous]
         public IActionResult WaitConfirmation()
         {
-            ViewBag.NickName = TempData["NickName"];
-            
             return View();
         }
     }
