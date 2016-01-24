@@ -58,6 +58,10 @@ namespace E5R.Product.WebSite
                     .Replace('.', ':');
             }
             
+            Logger.LogInformation($"RuntimeFramework: { appEnv.RuntimeFramework.FullName }");
+            Logger.LogInformation($"BasePath: { appEnv.ApplicationBasePath }");
+            Logger.LogInformation($"WebRootPath: { env.WebRootPath }");
+            
             Logger.LogVerbose($"ProductNs = { ProductNs }");
             
             var builder = new ConfigurationBuilder()
