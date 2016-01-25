@@ -9,9 +9,6 @@
   - Addin para envio de e-mails com Mailgun (https://mailgun.com) 
 * Páginas adicionadas
   - Cadastro: *account/signup*
-* Informações de licença adicionadas
-  - LICENSE.txt
-  - Cabeçalho em cada arquivo .CS
 * Script **watch** renomeado para **run-dev**
 
 0.1.0-alpha3
