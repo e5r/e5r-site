@@ -10,7 +10,10 @@
 @if(Model.Confirmed)
 {
     <p>
-        Thank you <strong>@Model.FirstName</strong> for confirming your email. Please <a asp-controller="account" asp-action="signin">Click here to Sign in</a>.
+        Thank you <strong>@Model.FirstName</strong> for confirming your email.
+    </p>
+    <p>
+        Now just wait for the assessment of its material and hope to receive your new E5R name!
     </p>
 } else {
     <h3>Errors:</h3>

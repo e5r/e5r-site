@@ -8,10 +8,12 @@ namespace E5R.Product.WebSite.Data.ViewModel
     public class ConfirmEmailViewModel
     {
         [Required]
-        public string TempName { get; set; }
+        // UserName
+        public string UN { get; set; }
         
         [Required]
-        public string ConfirmationToken { get; set; }
+        // Confirmation Token
+        public string CT { get; set; }
         
         public bool Confirmed { get; set; }
         public string FirstName { get; set; }

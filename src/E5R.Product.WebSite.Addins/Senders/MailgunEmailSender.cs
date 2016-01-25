@@ -2,7 +2,6 @@
 // Licensed under the Apache License, Version 2.0. More license information in LICENSE.txt.
 
 using System;
-using System.Text;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
@@ -36,19 +35,18 @@ namespace E5R.Product.WebSite.Addins.Senders
             var domain = Options.Domain;
             var uri = $"{ domain }/messages";
             var key = Options.AppKey;
-            var auth = Convert.ToBase64String(Encoding.UTF8.GetBytes($"api:{ key }"));
+            var auth = $"api:{ key }".ToBase64();
             var client = new HttpClient();
-            var form = new FormDictionaryUtil();
             
             client.BaseAddress = new Uri(Options.BaseAddress); 
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", auth);
 
-            form.Set("from", Options.From)
+            var response = await client.PostAsync(uri, new FormUrlEncodedContent(new FormDictionaryUtil()
+                .Set("from", Options.From)
                 .Set("to", email)
                 .Set("subject", subject)
-                .Set("text", message);
-            
-            var response = await client.PostAsync(uri, new FormUrlEncodedContent(form));
+                .Set("text", message)
+            ));
             var requestedUri = response.RequestMessage.RequestUri.AbsoluteUri;
             var responseString = await response.Content.ReadAsStringAsync();
 

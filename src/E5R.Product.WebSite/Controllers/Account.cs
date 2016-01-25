@@ -11,6 +11,7 @@ using System.Linq;
 
 namespace E5R.Product.WebSite.Controllers
 {
+    using Core.Utils;
     using Abstractions.Services;
     using Abstractions.Business;
     using Data.ViewModel;
@@ -136,6 +137,10 @@ namespace E5R.Product.WebSite.Controllers
                 
                 // Generate temporary username
                 var tempUserName = string.Concat(ProductOptions.AUTH_USER_TEMP_PREFIX, Guid.NewGuid().ToString("N"));
+                var tempUserNameBase64 = tempUserName.ToBase64();
+                
+                Logger.LogVerbose($"TempUserName: { tempUserName }");
+                Logger.LogVerbose($"TempUserName Base64: { tempUserNameBase64 }");
                 
                 var user = new User
                 {
@@ -146,8 +151,7 @@ namespace E5R.Product.WebSite.Controllers
                 user.Profile = new UserProfile
                 {
                     FirstName = model.FirstName,
-                    LastName = model.LastName,
-                    User = user
+                    LastName = model.LastName
                 };
                 
                 if (await UserManager.FindByNameAsync(user.UserName) != null)
@@ -162,7 +166,7 @@ namespace E5R.Product.WebSite.Controllers
                     Logger.LogInformation("User created a new account with password.");
                     
                     var confirmCode = await UserManager.GenerateEmailConfirmationTokenAsync(user);
-                    var callbackUrl = Url.Action(nameof(Account.ConfirmEmail), nameof(Account), new { TempName = user.UserName, ConfirmationToken = confirmCode }, HttpContext.Request.Scheme);
+                    var callbackUrl = Url.Action(nameof(Account.ConfirmEmail), nameof(Account), new { un = tempUserNameBase64, ct = confirmCode }, HttpContext.Request.Scheme);
                     
                     try
                     {
@@ -197,15 +201,18 @@ namespace E5R.Product.WebSite.Controllers
             {
                 await SignInManager.SignOutAsync();
                 
-                var user = AuthContext.Users.SingleOrDefault(w => w.UserName == model.TempName);
+                var user = AuthContext.Users.SingleOrDefault(w => w.UserName == model.UN.FromBase64());
+                
+                // HACK: Bugfix - Profile not automatic loaded
+                AuthContext.UserProfiles.SingleOrDefault(p => p.UserId == user.Id);
                 
                 if (user == null)
                 {
                     ModelState.AddModelError(string.Empty, $"User not found!");
                     return View(model);
                 }
-                
-                var result = await UserManager.ConfirmEmailAsync(user, model.ConfirmationToken);
+                                
+                var result = await UserManager.ConfirmEmailAsync(user, model.CT);
                 
                 if (result.Succeeded)
                 {
