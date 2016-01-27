@@ -32,5 +32,15 @@ namespace E5R.Product.WebSite.Data.ViewModel
         [DataType(DataType.Password)]
         [Display(Name = "Confirm password")]
         public string ConfirmPassword { get; set; }
+        
+        [Required]
+        [DataType(DataType.MultilineText)]
+        [Display(Name = "Because you deserve to join the team?")]
+        public string MyAnswer { get; set; }
+        
+        [Required]
+        [DataType(DataType.MultilineText)]
+        [Display(Name = "Add your web links")]
+        public string MyLinks { get; set; }
     }
 }

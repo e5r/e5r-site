@@ -15,16 +15,19 @@ namespace E5R.Product.WebSite.Data.Context
         
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            builder.Entity<User>()
-                .HasOne(u => u.Profile)
-                .WithOne(p => p.User)
-                .HasForeignKey<UserProfile>(p => p.UserId)
-                .OnDelete(DeleteBehavior.Restrict);
-                
-            builder.Entity<UserProfile>()
-                .HasKey(p => p.UserId);
-            
             base.OnModelCreating(builder);
+
+            builder.Entity<UserProfile>(b => {
+                b.HasKey(p => p.UserId);
+                b.HasOne(p => p.User)
+                 .WithOne(u => u.Profile);
+            });
+            
+            builder.Entity<AskTheTeam>(b => {
+                b.HasKey(att => att.UserId);
+                b.HasOne(att => att.User)
+                 .WithOne(u => u.AskTheTeam);
+            });
         }
     }
 }

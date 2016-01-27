@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. More license information in LICENSE.txt.
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Mvc;
 using Microsoft.AspNet.Identity;
@@ -114,6 +115,7 @@ namespace E5R.Product.WebSite.Controllers
             return View();
         }
         
+        // TODO: Refactor this action
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -123,12 +125,66 @@ namespace E5R.Product.WebSite.Controllers
             {
                 await SignInManager.SignOutAsync();
 
+                // MyAnswer
+                var normalizedMyAnswer = string.Empty;
+                foreach (var line in model.MyAnswer.Trim().Split(Environment.NewLine.ToArray()))
+                {
+                    var lineNormalized = line.Trim();
+
+                    if (lineNormalized.Length > 2)
+                    {
+                        normalizedMyAnswer += lineNormalized;
+                    }
+                }
+                
+                Logger.LogInformation($"Normalized MyAnswer: { normalizedMyAnswer }");
+                
+                if (normalizedMyAnswer.Length < 30)
+                {
+                    ModelState.AddModelError(nameof(model.MyAnswer), "Your answer is very short. I know you get something better.");
+                }
+                
+                // My links
+                var myLinks = new List<string>();
+                var myLinksInvalidated = false;
+                foreach (var link in model.MyLinks.Trim().Split(Environment.NewLine.ToArray()))
+                {
+                    var linkNormalized = link.Trim();
+                    
+                    if (linkNormalized.Length > 0)
+                    {
+                        Uri newUri;
+                        var createduri = Uri.TryCreate(linkNormalized, UriKind.Absolute, out newUri);
+
+                        Logger.LogInformation($"Links URI.scheme: { newUri?.Scheme }");
+
+                        if (!createduri || !"http,https".Contains(newUri.Scheme))
+                        {
+                            myLinksInvalidated = true;
+                            ModelState.AddModelError(nameof(model.MyLinks), "Tell valid URL's in your links.");
+                            break;
+                        }
+
+                        myLinks.Add(linkNormalized);
+                    }
+                }
+                
+                if (!myLinksInvalidated && 1 > myLinks.Count)
+                {
+                    ModelState.AddModelError(nameof(model.MyLinks), "Tell valid URL's in your links.");
+                }
+                
+                // Password
                 if (model.Password != model.ConfirmPassword)
                 {
                     ModelState.AddModelError(nameof(model.ConfirmPassword), "Invalid password confirmation.");
+                }
+                
+                if(!ModelState.IsValid){
                     return View(model);
                 }
                 
+                // Email
                 if (AuthContext.Users.Count(c => string.Compare(c.Email, model.Email) == 0) > 0)
                 {
                     ModelState.AddModelError(nameof(model.Email), "E-mail already registered");
@@ -137,23 +193,23 @@ namespace E5R.Product.WebSite.Controllers
                 
                 // Generate temporary username
                 var tempUserName = string.Concat(ProductOptions.AUTH_USER_TEMP_PREFIX, Guid.NewGuid().ToString("N"));
-                var tempUserNameBase64 = tempUserName.ToBase64();
-                
-                Logger.LogVerbose($"TempUserName: { tempUserName }");
-                Logger.LogVerbose($"TempUserName Base64: { tempUserNameBase64 }");
                 
                 var user = new User
                 {
                     UserName = tempUserName,
-                    Email = model.Email
+                    Email = model.Email,
+                    Profile = new UserProfile
+                    {
+                        FirstName = model.FirstName,
+                        LastName = model.LastName
+                    },
+                    AskTheTeam = new AskTheTeam
+                    {
+                        MyAnswer = model.MyAnswer,
+                        MyLinks = string.Join(Environment.NewLine, myLinks.ToArray())
+                    }
                 };
 
-                user.Profile = new UserProfile
-                {
-                    FirstName = model.FirstName,
-                    LastName = model.LastName
-                };
-                
                 if (await UserManager.FindByNameAsync(user.UserName) != null)
                 {
                     throw new Exception("Houston, i have a problem! Could not deduct a temporary username. Try again.");
@@ -166,7 +222,7 @@ namespace E5R.Product.WebSite.Controllers
                     Logger.LogInformation("User created a new account with password.");
                     
                     var confirmCode = await UserManager.GenerateEmailConfirmationTokenAsync(user);
-                    var callbackUrl = Url.Action(nameof(Account.ConfirmEmail), nameof(Account), new { un = tempUserNameBase64, ct = confirmCode }, HttpContext.Request.Scheme);
+                    var callbackUrl = Url.Action(nameof(Account.ConfirmEmail), nameof(Account), new { un = tempUserName.ToBase64(), ct = confirmCode }, HttpContext.Request.Scheme);
                     
                     try
                     {

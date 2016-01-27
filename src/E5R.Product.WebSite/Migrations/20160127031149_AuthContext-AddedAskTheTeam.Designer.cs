@@ -8,9 +8,10 @@ using E5R.Product.WebSite.Data.Context;
 namespace E5R.Product.WebSite.Migrations
 {
     [DbContext(typeof(AuthContext))]
-    partial class AuthContextModelSnapshot : ModelSnapshot
+    [Migration("20160127031149_AuthContext-AddedAskTheTeam")]
+    partial class AuthContextAddedAskTheTeam
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder
                 .HasAnnotation("ProductVersion", "7.0.0-rc1-16348")
