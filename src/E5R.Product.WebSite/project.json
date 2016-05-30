@@ -20,7 +20,7 @@
         "E5R.Product.WebSite.Core": "",
         "E5R.Product.WebSite.Addins": "",
         "EntityFramework.Commands": "7.0.0-rc1-final",
-        "EntityFramework.SQLite": "7.0.0-rc1-final",
+        "EntityFramework.Sqlite": "7.0.0-rc1-final",
         "EntityFramework.MicrosoftSqlServer": "7.0.0-rc1-final",
         "Microsoft.AspNet.Authentication.Cookies": "1.0.0-rc1-final",
         "Microsoft.AspNet.Authorization": "1.0.0-rc1-final",
