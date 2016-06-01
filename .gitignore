@@ -1,0 +1,6 @@
+node_modules/
+dist/
+typings/
+
+src/e5r.website/app/*.js
+src/e5r.website/app/*.map

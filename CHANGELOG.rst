@@ -1,4 +1,4 @@
-0.1.0-dev
+1.0.0-dev
 =========
 
 * Novo site em desenvolvimento
