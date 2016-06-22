@@ -12,6 +12,14 @@ if not exist "src\e5r.website\js\lib\Reflect.js.map" xcopy /Q /Y "node_modules\r
 if not exist "src\e5r.website\js\lib\system.js" echo Installing systemjs... && xcopy /Q /Y "node_modules\systemjs\dist\system.js" "src\e5r.website\js\lib\" >nul 2>&1
 if not exist "src\e5r.website\js\lib\system.js.map" xcopy /Q /Y "node_modules\systemjs\dist\system.js.map" "src\e5r.website\js\lib\" >nul 2>&1
 
+if not exist "src\e5r.website\js\lib\jquery.min.js" echo Installing jQuery... && xcopy /Q /Y "node_modules\jquery\dist\jquery.min.js" "src\e5r.website\js\lib\" >nul 2>&1
+
+if not exist "src\e5r.website\js\lib\bootstrap.min.js" echo Installing Bootstrap... && xcopy /Q /Y "node_modules\bootstrap\dist\js\bootstrap.min.js" "src\e5r.website\js\lib\" >nul 2>&1
+if not exist "src\e5r.website\css\lib\bootstrap.min.css" xcopy /Q /Y "node_modules\bootstrap\dist\css\bootstrap.min.css" "src\e5r.website\css\lib\" >nul 2>&1
+
+if not exist "src\e5r.website\js\lib\tether.min.js" echo Installing Tether... && xcopy /Q /Y "node_modules\tether\dist\js\tether.min.js" "src\e5r.website\js\lib\" >nul 2>&1
+if not exist "src\e5r.website\css\lib\tether.min.css" xcopy /Q /Y "node_modules\tether\dist\css\tether.min.css" "src\e5r.website\css\lib\" >nul 2>&1
+
 if not exist "src\e5r.website\js\lib\@angular\" (
     echo Installing Angular2...
     mkdir "src\e5r.website\js\lib\@angular" >nul 2>&1

@@ -1,6 +1,7 @@
 node_modules/
 dist/
 typings/
+src/e5r.website/css/lib/
 src/e5r.website/js/lib/
 
 src/e5r.website/app/*.js
